@@ -1,0 +1,27 @@
+{
+  "name": "gestao-de-obras-e-cotacao-de-insumos",
+  "version": "1.0.0",
+  "description": "Este projeto implementa uma API GraphQL para gestão de obras e suprimentos, com foco em **performance**, **modelagem de dados correta**, **arquitetura limpa** e **testabilidade**.",
+  "license": "ISC",
+  "author": "Alessandro Fuhr de Mello",
+  "type": "module",
+  "main": "src/main/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "dev": "tsx watch src/main/index.ts",
+    "build": "tsc",
+    "start": "node dist/main/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "@vitest/coverage-v8": "^1.6.0",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {}
+}
