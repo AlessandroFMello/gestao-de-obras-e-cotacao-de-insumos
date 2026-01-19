@@ -1,5 +1,6 @@
 import { DomainError } from '../errors/index.js';
 import { randomUUID } from 'crypto';
+import { normalizeString } from '../utils/stringNormalizer.js';
 
 export class Supplier {
   private constructor(
@@ -22,7 +23,10 @@ export class Supplier {
       );
     }
 
-    return new Supplier(id || randomUUID(), nameTrimmed);
+    // Normalize string to remove accents and special characters
+    const nameNormalized = normalizeString(nameTrimmed);
+
+    return new Supplier(id || randomUUID(), nameNormalized);
   }
 
   getId(): string {

@@ -1,5 +1,6 @@
 import { DomainError } from '../errors/index.js';
 import { randomUUID } from 'crypto';
+import { normalizeString } from '../utils/stringNormalizer.js';
 
 export class Category {
   private constructor(
@@ -20,7 +21,9 @@ export class Category {
       throw new DomainError(`Category name cannot exceed ${Category.MAX_NAME_LENGTH} characters`);
     }
 
-    return new Category(id || randomUUID(), nameTrimmed);
+    const nameNormalized = normalizeString(nameTrimmed);
+
+    return new Category(id || randomUUID(), nameNormalized);
   }
 
   getId(): string {
