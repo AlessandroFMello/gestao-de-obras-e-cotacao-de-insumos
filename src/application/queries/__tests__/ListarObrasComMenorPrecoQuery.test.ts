@@ -21,8 +21,11 @@ describe('ListarObrasComMenorPrecoQuery', () => {
   });
 
   it('should return work with cheapest quote for each associated supply', async () => {
-    // Arrange
-    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (...args: any[]) => Promise<infer R> ? R : never = [
+    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (
+      ...args: any[]
+    ) => Promise<infer R>
+      ? R
+      : never = [
       {
         workId: 'work-1',
         workName: 'Obra Alpha',
@@ -55,10 +58,8 @@ describe('ListarObrasComMenorPrecoQuery', () => {
       .mockResolvedValueOnce(mockCheapestQuote1)
       .mockResolvedValueOnce(mockCheapestQuote2);
 
-    // Act
     const result = await query.execute();
 
-    // Assert
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       workId: 'work-1',
@@ -71,8 +72,11 @@ describe('ListarObrasComMenorPrecoQuery', () => {
   });
 
   it('should include NULL for supplies without active quotes', async () => {
-    // Arrange
-    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (...args: any[]) => Promise<infer R> ? R : never = [
+    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (
+      ...args: any[]
+    ) => Promise<infer R>
+      ? R
+      : never = [
       {
         workId: 'work-1',
         workName: 'Obra Alpha',
@@ -95,10 +99,8 @@ describe('ListarObrasComMenorPrecoQuery', () => {
       .mockResolvedValueOnce(mockCheapestQuote1)
       .mockResolvedValueOnce(null); // No active quote for supply-2
 
-    // Act
     const result = await query.execute();
 
-    // Assert
     expect(result).toHaveLength(1);
     expect(result[0].cheapestQuotes).toHaveLength(2);
     expect(result[0].cheapestQuotes[0]).toEqual(mockCheapestQuote1);
@@ -106,8 +108,11 @@ describe('ListarObrasComMenorPrecoQuery', () => {
   });
 
   it('should not return works without supplies', async () => {
-    // Arrange
-    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (...args: any[]) => Promise<infer R> ? R : never = [
+    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (
+      ...args: any[]
+    ) => Promise<infer R>
+      ? R
+      : never = [
       {
         workId: 'work-1',
         workName: 'Obra Alpha',
@@ -117,17 +122,18 @@ describe('ListarObrasComMenorPrecoQuery', () => {
 
     vi.mocked(workReadRepository.findAllWithSupplies).mockResolvedValue(mockWork);
 
-    // Act
     const result = await query.execute();
 
-    // Assert
     expect(result).toHaveLength(0);
     expect(cotacaoReadRepository.findCheapestBySupplyId).not.toHaveBeenCalled();
   });
 
   it('should return multiple works correctly', async () => {
-    // Arrange
-    const mockWorks: IWorkReadRepository['findAllWithSupplies'] extends (...args: any[]) => Promise<infer R> ? R : never = [
+    const mockWorks: IWorkReadRepository['findAllWithSupplies'] extends (
+      ...args: any[]
+    ) => Promise<infer R>
+      ? R
+      : never = [
       {
         workId: 'work-1',
         workName: 'Obra Alpha',
@@ -165,10 +171,8 @@ describe('ListarObrasComMenorPrecoQuery', () => {
       .mockResolvedValueOnce(mockCheapestQuote1)
       .mockResolvedValueOnce(mockCheapestQuote2);
 
-    // Act
     const result = await query.execute();
 
-    // Assert
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       workId: 'work-1',
@@ -183,8 +187,11 @@ describe('ListarObrasComMenorPrecoQuery', () => {
   });
 
   it('should only consider active quotes (valid_to IS NULL)', async () => {
-    // Arrange
-    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (...args: any[]) => Promise<infer R> ? R : never = [
+    const mockWork: IWorkReadRepository['findAllWithSupplies'] extends (
+      ...args: any[]
+    ) => Promise<infer R>
+      ? R
+      : never = [
       {
         workId: 'work-1',
         workName: 'Obra Alpha',
@@ -205,25 +212,19 @@ describe('ListarObrasComMenorPrecoQuery', () => {
     vi.mocked(workReadRepository.findAllWithSupplies).mockResolvedValue(mockWork);
     vi.mocked(cotacaoReadRepository.findCheapestBySupplyId).mockResolvedValue(mockCheapestQuote);
 
-    // Act
     const result = await query.execute();
 
-    // Assert
     expect(result[0].cheapestQuotes[0]).toEqual(mockCheapestQuote);
     // The repository is responsible for filtering non-active quotes
     // This is tested at the repository level
   });
 
   it('should respect limit parameter', async () => {
-    // Arrange
     const limit = 2;
     vi.mocked(workReadRepository.findAllWithSupplies).mockResolvedValue([]);
 
-    // Act
     await query.execute(limit);
 
-    // Assert
     expect(workReadRepository.findAllWithSupplies).toHaveBeenCalledWith(limit);
   });
 });
-

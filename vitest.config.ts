@@ -10,6 +10,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'dist/',
+        'prisma/',
         '**/*.config.ts',
         '**/*.config.js',
         '**/main/**',
@@ -18,4 +19,3 @@ export default defineConfig({
     include: ['**/*.test.ts', '**/*.spec.ts'],
   },
 });
-
