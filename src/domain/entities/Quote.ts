@@ -2,6 +2,7 @@ import { DomainError } from '../errors/index.js';
 import { randomUUID } from 'crypto';
 import { Supply } from './Supply.js';
 import { Supplier } from './Supplier.js';
+import { normalizeString } from '../utils/stringNormalizer.js';
 
 export class Quote {
   private constructor(
@@ -63,9 +64,12 @@ export class Quote {
       throw new DomainError('Quote must have a supplier');
     }
 
+    // Normalize string to remove accents and special characters
+    const skuNormalized = normalizeString(skuTrimmed);
+
     return new Quote(
       id || randomUUID(),
-      skuTrimmed,
+      skuNormalized,
       unitPrice,
       deliveryDays,
       validFrom,

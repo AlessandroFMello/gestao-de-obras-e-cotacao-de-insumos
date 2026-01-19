@@ -1,6 +1,7 @@
 import { DomainError } from '../errors/index.js';
 import { randomUUID } from 'crypto';
 import { Category } from './Category.js';
+import { normalizeString } from '../utils/stringNormalizer.js';
 
 export class Supply {
   private constructor(
@@ -52,10 +53,14 @@ export class Supply {
       throw new DomainError('Supply must have a category');
     }
 
+    // Normalize strings to remove accents and special characters
+    const nameNormalized = normalizeString(nameTrimmed);
+    const typeNormalized = normalizeString(typeTrimmed);
+
     return new Supply(
       id || randomUUID(),
-      nameTrimmed,
-      typeTrimmed,
+      nameNormalized,
+      typeNormalized,
       weightKg,
       category
     );

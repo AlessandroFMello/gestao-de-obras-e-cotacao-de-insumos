@@ -60,4 +60,18 @@ describe('Category', () => {
       }).toThrow(DomainError);
     });
   });
+
+  describe('string normalization', () => {
+    it('should normalize string by removing accents', () => {
+      const category = Category.create('Construções');
+
+      expect(category.getName()).toBe('Construcoes');
+    });
+
+    it('should normalize string by replacing ç with c', () => {
+      const category = Category.create('Açaí');
+
+      expect(category.getName()).toBe('Acai');
+    });
+  });
 });

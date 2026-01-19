@@ -192,4 +192,25 @@ describe('Supply', () => {
       }).toThrow('Supply must have a category');
     });
   });
+
+  describe('string normalization', () => {
+    it('should normalize name by removing accents', () => {
+      const supply = Supply.create('Tábua Pinus', 'Metro Linear', 8.5, validCategory);
+
+      expect(supply.getName()).toBe('Tabua Pinus');
+    });
+
+    it('should normalize type by removing accents', () => {
+      const supply = Supply.create('Tijolo', 'Cerâmico', 2.5, validCategory);
+
+      expect(supply.getType()).toBe('Ceramico');
+    });
+
+    it('should normalize both name and type', () => {
+      const supply = Supply.create('Tábua Cerâmica', 'Metro Linear', 8.5, validCategory);
+
+      expect(supply.getName()).toBe('Tabua Ceramica');
+      expect(supply.getType()).toBe('Metro Linear');
+    });
+  });
 });
