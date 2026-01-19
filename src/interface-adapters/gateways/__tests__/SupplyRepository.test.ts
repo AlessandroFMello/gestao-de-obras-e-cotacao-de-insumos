@@ -74,7 +74,8 @@ describe('SupplyRepository', () => {
 
     expect(result).not.toBeNull();
     expect(result?.getId()).toBe('2');
-    expect(result?.getName()).toBe('Areia Média');
+    // Domain entity normalizes strings (removes accents)
+    expect(result?.getName()).toBe('Areia Media');
     expect(result?.getType()).toBe('m³');
     expect(result?.getWeightKg()).toBe(1500.0);
     expect(result?.getCategory().getId()).toBe('2');
