@@ -12,7 +12,7 @@
     "test:coverage": "vitest run --coverage",
     "dev": "tsx watch src/main/index.ts",
     "build": "tsc",
-    "start": "node dist/main/index.js",
+    "start": "node dist/src/main/index.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
@@ -41,6 +41,9 @@
   },
   "dependencies": {
     "@apollo/server": "^5.2.0",
-    "graphql": "^16.12.0"
+    "@prisma/adapter-mariadb": "^7.2.0",
+    "graphql": "^16.12.0",
+    "mariadb": "^3.4.5",
+    "mysql2": "^3.16.1"
   }
 }
