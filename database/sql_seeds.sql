@@ -2,6 +2,7 @@ USE obras_insumos_db;
 
 -- Limpar dados existentes (cuidado em producao!)
 SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE inspecoes;
 TRUNCATE TABLE obras_insumos;
 TRUNCATE TABLE cotacoes;
 TRUNCATE TABLE obras;
@@ -113,3 +114,22 @@ INSERT INTO obras_insumos (obra_id, insumo_id) VALUES
 (3, 1), -- Cimento CP-II E-32
 (3, 5), -- Ferro CA-50 10mm
 (3, 8); -- Tabua Pinus
+
+-- Inspeções para as obras
+INSERT INTO inspecoes (obra_id, status, note, created_at) VALUES
+-- Inspeções para Obra 1
+(1, 'APPROVED', 'Estrutura aprovada. Fundacoes em conformidade.', '2024-01-15 10:00:00'),
+(1, 'PENDING', 'Aguardando revisao de instalacoes eletricas.', '2024-01-20 14:30:00'),
+(1, 'APPROVED', 'Instalacoes hidraulicas aprovadas.', '2024-01-25 09:15:00'),
+(1, 'REJECTED', 'Necessario ajuste na impermeabilizacao.', '2024-02-01 16:45:00'),
+(1, 'APPROVED', 'Impermeabilizacao corrigida e aprovada.', '2024-02-05 11:20:00'),
+
+-- Inspeções para Obra 2
+(2, 'APPROVED', 'Projeto estrutural aprovado.', '2024-01-10 08:00:00'),
+(2, 'PENDING', 'Aguardando documentacao de licenca.', '2024-01-18 13:00:00'),
+(2, 'APPROVED', 'Licenca obtida. Inicio de obras aprovado.', '2024-01-22 10:30:00'),
+
+-- Inspeções para Obra 3
+(3, 'APPROVED', 'Terreno preparado e aprovado.', '2024-01-05 09:00:00'),
+(3, 'APPROVED', 'Fundacoes concluidas com sucesso.', '2024-01-12 15:00:00'),
+(3, 'PENDING', 'Aguardando entrega de materiais.', '2024-01-28 10:00:00');

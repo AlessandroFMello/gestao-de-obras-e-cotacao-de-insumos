@@ -9,18 +9,19 @@ async function seed() {
   const prisma = getPrismaClient();
 
   try {
+    await prisma.$connect();
     console.log('Starting database seed...');
 
     // Clear existing data (careful in production!)
-    console.log('Clearing existing data...');
-    await prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 0`;
-    await prisma.$executeRaw`TRUNCATE TABLE obras_insumos`;
-    await prisma.$executeRaw`TRUNCATE TABLE cotacoes`;
-    await prisma.$executeRaw`TRUNCATE TABLE obras`;
-    await prisma.$executeRaw`TRUNCATE TABLE insumos`;
-    await prisma.$executeRaw`TRUNCATE TABLE fornecedores`;
-    await prisma.$executeRaw`TRUNCATE TABLE categorias`;
-    await prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 1`;
+    // console.log('Clearing existing data...');
+    // await prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 0`;
+    // await prisma.$executeRaw`TRUNCATE TABLE obras_insumos`;
+    // await prisma.$executeRaw`TRUNCATE TABLE cotacoes`;
+    // await prisma.$executeRaw`TRUNCATE TABLE obras`;
+    // await prisma.$executeRaw`TRUNCATE TABLE insumos`;
+    // await prisma.$executeRaw`TRUNCATE TABLE fornecedores`;
+    // await prisma.$executeRaw`TRUNCATE TABLE categorias`;
+    // await prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 1`;
 
     console.log('Inserting categories...');
     await prisma.$executeRaw`
@@ -119,6 +120,25 @@ async function seed() {
       (3, 8)
     `;
 
+    console.log('Inserting inspections...');
+    await prisma.$executeRaw`
+      INSERT INTO inspecoes (obra_id, status, note, created_at) VALUES
+      -- Inspections for Work 1
+      (1, 'APPROVED', 'Estrutura aprovada. Fundacoes em conformidade.', '2024-01-15 10:00:00'),
+      (1, 'PENDING', 'Aguardando revisao de instalacoes eletricas.', '2024-01-20 14:30:00'),
+      (1, 'APPROVED', 'Instalacoes hidraulicas aprovadas.', '2024-01-25 09:15:00'),
+      (1, 'REJECTED', 'Necessario ajuste na impermeabilizacao.', '2024-02-01 16:45:00'),
+      (1, 'APPROVED', 'Impermeabilizacao corrigida e aprovada.', '2024-02-05 11:20:00'),
+      -- Inspections for Work 2
+      (2, 'APPROVED', 'Projeto estrutural aprovado.', '2024-01-10 08:00:00'),
+      (2, 'PENDING', 'Aguardando documentacao de licenca.', '2024-01-18 13:00:00'),
+      (2, 'APPROVED', 'Licenca obtida. Inicio de obras aprovado.', '2024-01-22 10:30:00'),
+      -- Inspections for Work 3
+      (3, 'APPROVED', 'Terreno preparado e aprovado.', '2024-01-05 09:00:00'),
+      (3, 'APPROVED', 'Fundacoes concluidas com sucesso.', '2024-01-12 15:00:00'),
+      (3, 'PENDING', 'Aguardando entrega de materiais.', '2024-01-28 10:00:00')
+    `;
+
     console.log('Seed completed successfully!');
     console.log('\nSummary:');
     console.log('  - 5 Categories');
@@ -127,6 +147,7 @@ async function seed() {
     console.log('  - 20 Quotes (some active, some historical)');
     console.log('  - 3 Works');
     console.log('  - 10 Work-Supply associations');
+    console.log('  - 11 Inspections');
     console.log('\nThe Supply ID 1 has 4 quotes (3 active, 1 historical)');
     console.log('   The cheapest active quote for Supply ID 1 is from Supplier B (R$ 25.40)');
   } catch (error) {
