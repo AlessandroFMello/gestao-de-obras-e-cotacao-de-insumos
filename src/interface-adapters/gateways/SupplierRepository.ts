@@ -34,4 +34,3 @@ export class SupplierRepository implements ISupplierRepository {
     return Supplier.create(row.nome, String(row.id));
   }
 }
-

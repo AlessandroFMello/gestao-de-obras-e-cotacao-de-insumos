@@ -81,10 +81,7 @@ export class CotacaoWriteRepository implements ICotacaoWriteRepository {
     throw new Error(`Invalid ID format: ${id}. Expected numeric ID or format like "supply-1"`);
   }
 
-  async findActiveBySupplyAndSupplier(
-    supplyId: string,
-    supplierId: string
-  ): Promise<Quote | null> {
+  async findActiveBySupplyAndSupplier(supplyId: string, supplierId: string): Promise<Quote | null> {
     const prisma = getPrismaClient();
 
     const result = await prisma.$queryRaw<
@@ -194,4 +191,3 @@ export class CotacaoWriteRepository implements ICotacaoWriteRepository {
     );
   }
 }
-
