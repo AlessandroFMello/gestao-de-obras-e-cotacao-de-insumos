@@ -60,18 +60,50 @@ CREATE TABLE IF NOT EXISTS obras_insumos (
         REFERENCES insumos(id)
 );
 
+CREATE TABLE IF NOT EXISTS inspecoes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    obra_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    note TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_inspecao_obra
+        FOREIGN KEY (obra_id)
+        REFERENCES obras(id)
+);
+
+-- Índices para cotacoes
+CREATE INDEX fk_cotacao_fornecedor
+ON cotacoes (fornecedor_id);
+
 CREATE INDEX idx_cotacao_vigente
 ON cotacoes (insumo_id, valid_to);
 
 CREATE INDEX idx_cotacao_preco
 ON cotacoes (insumo_id, preco_unitario);
 
+-- Índices para obras_insumos
+CREATE INDEX fk_obra_insumo_insumo
+ON obras_insumos (insumo_id);
+
 CREATE INDEX idx_obra_insumo
 ON obras_insumos (obra_id, insumo_id);
+
+-- Índices para insumos
+CREATE INDEX idx_insumo_categoria
+ON insumos (categoria_id);
+
+-- Índices para inspecoes
+CREATE INDEX idx_inspecao_obra_data
+ON inspecoes (obra_id, created_at);
+
+CREATE INDEX fk_inspecao_obra
+ON inspecoes (obra_id);
 
 -- =========================================================
 -- Observações:
 -- - Cotação vigente: valid_to IS NULL
 -- - Histórico suportado via versionamento
 -- - Modelo preparado para futuras extensões (obra/região)
+-- - Inspeções ordenadas por created_at DESC para queries eficientes
 -- =========================================================
