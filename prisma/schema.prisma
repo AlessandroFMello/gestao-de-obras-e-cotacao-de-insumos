@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client"
   output   = "./generated"
@@ -10,5 +7,74 @@ datasource db {
   provider = "mysql"
 }
 
-// Models will be added as we implement the domain entities
+model categorias {
+  id      BigInt    @id @default(autoincrement())
+  nome    String    @db.VarChar(100)
+  insumos insumos[]
+}
 
+model cotacoes {
+  id                 BigInt       @id @default(autoincrement())
+  insumo_id          BigInt
+  fornecedor_id      BigInt
+  sku                String       @db.VarChar(100)
+  preco_unitario     Decimal      @db.Decimal(10, 2)
+  prazo_entrega_dias Int
+  valid_from         DateTime     @db.DateTime(0)
+  valid_to           DateTime?    @db.DateTime(0)
+  fornecedores       fornecedores @relation(fields: [fornecedor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cotacao_fornecedor")
+  insumos            insumos      @relation(fields: [insumo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cotacao_insumo")
+
+  @@index([fornecedor_id], map: "fk_cotacao_fornecedor")
+  @@index([insumo_id, preco_unitario], map: "idx_cotacao_preco")
+  @@index([insumo_id, valid_to], map: "idx_cotacao_vigente")
+}
+
+model fornecedores {
+  id       BigInt     @id @default(autoincrement())
+  nome     String     @db.VarChar(150)
+  cotacoes cotacoes[]
+}
+
+model insumos {
+  id            BigInt          @id @default(autoincrement())
+  nome          String          @db.VarChar(150)
+  tipo          String          @db.VarChar(50)
+  peso_kg       Decimal         @db.Decimal(10, 2)
+  categoria_id  BigInt
+  cotacoes      cotacoes[]
+  categorias    categorias      @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_insumo_categoria")
+  obras_insumos obras_insumos[]
+
+  @@index([categoria_id], map: "fk_insumo_categoria")
+}
+
+model obras {
+  id            BigInt          @id @default(autoincrement())
+  nome          String          @db.VarChar(150)
+  obras_insumos obras_insumos[]
+  inspecoes     inspecoes[]
+}
+
+model inspecoes {
+  id         BigInt   @id @default(autoincrement())
+  obra_id    BigInt
+  status     String   @db.VarChar(50)
+  note       String?  @db.Text
+  created_at DateTime @default(now()) @db.DateTime(0)
+  obras      obras    @relation(fields: [obra_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_inspecao_obra")
+
+  @@index([obra_id, created_at], map: "idx_inspecao_obra_data")
+  @@index([obra_id], map: "fk_inspecao_obra")
+}
+
+model obras_insumos {
+  obra_id   BigInt
+  insumo_id BigInt
+  insumos   insumos @relation(fields: [insumo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_obra_insumo_insumo")
+  obras     obras   @relation(fields: [obra_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_obra_insumo_obra")
+
+  @@id([obra_id, insumo_id])
+  @@index([insumo_id], map: "fk_obra_insumo_insumo")
+  @@index([obra_id, insumo_id], map: "idx_obra_insumo")
+}
