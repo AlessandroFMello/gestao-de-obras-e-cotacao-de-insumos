@@ -1,9 +1,65 @@
 import { getPrismaClient } from '../../infrastructure/database/PrismaClientFactory.js';
 
-import type { IWorkReadRepository, WorkWithSuppliesDTO } from '../../application/ports/queries/IWorkReadRepository.js';
+import type {
+  IWorkReadRepository,
+  WorkWithSuppliesDTO,
+} from '../../application/ports/queries/IWorkReadRepository.js';
+import type { CategoryDTO } from '../../application/dtos/CategoryDTO.js';
+import type { InspectionDTO } from '../../application/dtos/InspectionDTO.js';
 import { Prisma } from '../../../prisma/generated/client.js';
 
 export class WorkReadRepository implements IWorkReadRepository {
+  async findCategoriesByWorkId(workId: string): Promise<CategoryDTO[]> {
+    const prisma = getPrismaClient();
+
+    const result = await prisma.$queryRaw<
+      Array<{
+        categoria_nome: string;
+      }>
+    >(
+      Prisma.sql`
+        SELECT DISTINCT cat.nome AS categoria_nome
+        FROM obras_insumos oi
+        INNER JOIN insumos i ON oi.insumo_id = i.id
+        INNER JOIN categorias cat ON i.categoria_id = cat.id
+        WHERE oi.obra_id = ${BigInt(workId)}
+        ORDER BY cat.nome
+      `
+    );
+
+    return result.map((row) => ({
+      name: row.categoria_nome,
+    }));
+  }
+
+  async findInspectionsByWorkId(workId: string, limit?: number): Promise<InspectionDTO[]> {
+    const prisma = getPrismaClient();
+
+    const limitClause = limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty;
+
+    const result = await prisma.$queryRaw<
+      Array<{
+        status: string;
+        note: string | null;
+      }>
+    >(
+      Prisma.sql`
+        SELECT 
+          status,
+          note
+        FROM inspecoes
+        WHERE obra_id = ${BigInt(workId)}
+        ORDER BY created_at DESC
+        ${limitClause}
+      `
+    );
+
+    return result.map((row) => ({
+      status: row.status,
+      note: row.note,
+    }));
+  }
+
   async findAllWithSupplies(limit?: number): Promise<WorkWithSuppliesDTO[]> {
     const prisma = getPrismaClient();
 
@@ -37,4 +93,3 @@ export class WorkReadRepository implements IWorkReadRepository {
       }));
   }
 }
-

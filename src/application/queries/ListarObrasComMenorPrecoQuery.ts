@@ -19,17 +19,21 @@ export class ListarObrasComMenorPrecoQuery {
         continue;
       }
 
-      // Get cheapest quote for each supply
-      const cheapestQuotes = await Promise.all(
-        work.supplyIds.map((supplyId) =>
-          this.cotacaoReadRepository.findCheapestBySupplyId(supplyId)
-        )
-      );
+      // Get cheapest quote across all supplies of the work
+      const cheapestQuote = await this.cotacaoReadRepository.findCheapestByWorkId(work.workId);
+      
+      // Get categories of supplies in this work
+      const categories = await this.workReadRepository.findCategoriesByWorkId(work.workId);
+      
+      // Get inspections for this work (fetch all, resolver will filter by last if needed)
+      const inspections = await this.workReadRepository.findInspectionsByWorkId(work.workId);
 
       results.push({
         workId: work.workId,
         workName: work.workName,
-        cheapestQuotes,
+        cheapestQuote,
+        categories,
+        inspections,
       });
     }
 

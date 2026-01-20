@@ -1,8 +1,12 @@
-import type { MenorPrecoInsumoDTO } from './MenorPrecoInsumoDTO.js';
+import type { CheapestQuoteDTO } from './CheapestQuoteDTO.js';
+import type { CategoryDTO } from './CategoryDTO.js';
+import type { InspectionDTO } from './InspectionDTO.js';
 
 export type ObraComMenorPrecoDTO = {
   workId: string;
   workName: string;
-  cheapestQuotes: MenorPrecoInsumoDTO[];
+  cheapestQuote: CheapestQuoteDTO;
+  categories: CategoryDTO[];
+  inspections: InspectionDTO[];
 };
 
