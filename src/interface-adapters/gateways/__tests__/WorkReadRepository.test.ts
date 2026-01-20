@@ -172,4 +172,121 @@ describe('WorkReadRepository', () => {
     expect(result[0].workId).toBe('1');
     expect(result[1].workId).toBe('2');
   });
+
+  describe('findCategoriesByWorkId', () => {
+    it('should return categories for a work', async () => {
+      const workId = '1';
+      const mockResult = [
+        { categoria_nome: 'Cimento' },
+        { categoria_nome: 'Ferro' },
+        { categoria_nome: 'Madeira' },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findCategoriesByWorkId(workId);
+
+      expect(result).toHaveLength(3);
+      expect(result).toEqual([
+        { name: 'Cimento' },
+        { name: 'Ferro' },
+        { name: 'Madeira' },
+      ]);
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty array when work has no supplies', async () => {
+      const workId = '999';
+      mockPrisma.$queryRaw.mockResolvedValue([]);
+
+      const result = await repository.findCategoriesByWorkId(workId);
+
+      expect(result).toEqual([]);
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return unique categories', async () => {
+      const workId = '1';
+      const mockResult = [
+        { categoria_nome: 'Cimento' },
+        { categoria_nome: 'Cimento' }, // Duplicado
+        { categoria_nome: 'Ferro' },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findCategoriesByWorkId(workId);
+
+      // DISTINCT na query garante unicidade
+      expect(result).toHaveLength(3);
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findInspectionsByWorkId', () => {
+    it('should return inspections for a work', async () => {
+      const workId = '1';
+      const mockResult = [
+        { status: 'APPROVED', note: 'Test note 1' },
+        { status: 'PENDING', note: 'Test note 2' },
+        { status: 'REJECTED', note: null },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findInspectionsByWorkId(workId);
+
+      expect(result).toHaveLength(3);
+      expect(result).toEqual([
+        { status: 'APPROVED', note: 'Test note 1' },
+        { status: 'PENDING', note: 'Test note 2' },
+        { status: 'REJECTED', note: null },
+      ]);
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty array when work has no inspections', async () => {
+      const workId = '999';
+      mockPrisma.$queryRaw.mockResolvedValue([]);
+
+      const result = await repository.findInspectionsByWorkId(workId);
+
+      expect(result).toEqual([]);
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should respect limit parameter', async () => {
+      const workId = '1';
+      const limit = 2;
+      // Query SQL aplica LIMIT, então retorna apenas os 2 primeiros
+      const mockResult = [
+        { status: 'APPROVED', note: 'Note 1' },
+        { status: 'PENDING', note: 'Note 2' },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findInspectionsByWorkId(workId, limit);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].status).toBe('APPROVED');
+      expect(result[1].status).toBe('PENDING');
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle null notes', async () => {
+      const workId = '1';
+      const mockResult = [
+        { status: 'APPROVED', note: null },
+        { status: 'PENDING', note: 'Some note' },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findInspectionsByWorkId(workId);
+
+      expect(result[0].note).toBeNull();
+      expect(result[1].note).toBe('Some note');
+    });
+  });
 });
