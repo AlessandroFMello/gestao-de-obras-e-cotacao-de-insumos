@@ -18,9 +18,7 @@ export class Supplier {
     }
 
     if (nameTrimmed.length > Supplier.MAX_NAME_LENGTH) {
-      throw new DomainError(
-        `Supplier name cannot exceed ${Supplier.MAX_NAME_LENGTH} characters`
-      );
+      throw new DomainError(`Supplier name cannot exceed ${Supplier.MAX_NAME_LENGTH} characters`);
     }
 
     // Normalize string to remove accents and special characters
@@ -37,4 +35,3 @@ export class Supplier {
     return this.name;
   }
 }
-

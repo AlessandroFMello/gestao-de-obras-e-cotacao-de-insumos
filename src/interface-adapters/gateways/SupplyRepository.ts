@@ -52,4 +52,3 @@ export class SupplyRepository implements ISupplyRepository {
     return Supply.create(row.nome, row.tipo, row.peso_kg, category, String(row.id));
   }
 }
-
