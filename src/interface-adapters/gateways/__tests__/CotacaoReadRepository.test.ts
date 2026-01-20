@@ -142,4 +142,87 @@ describe('CotacaoReadRepository', () => {
     expect(result?.deliveryDays).toBe(5);
     expect(typeof result?.deliveryDays).toBe('number');
   });
+
+  describe('findCheapestByWorkId', () => {
+    it('should return cheapest quote across all supplies of a work', async () => {
+      const workId = '1';
+      const mockResult = [
+        {
+          unit_price: 0.78,
+          sku: 'TIJ-CERAMICO-C',
+          supplier_name: 'Fornecedor C - Atacado',
+        },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findCheapestByWorkId(workId);
+
+      expect(result).not.toBeNull();
+      expect(result).toEqual({
+        unitPrice: 0.78,
+        sku: 'TIJ-CERAMICO-C',
+        supplierName: 'Fornecedor C - Atacado',
+      });
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when work has no active quotes', async () => {
+      const workId = '999';
+      mockPrisma.$queryRaw.mockResolvedValue([]);
+
+      const result = await repository.findCheapestByWorkId(workId);
+
+      expect(result).toBeNull();
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when work has no supplies', async () => {
+      const workId = '1';
+      mockPrisma.$queryRaw.mockResolvedValue([]);
+
+      const result = await repository.findCheapestByWorkId(workId);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return the cheapest quote when multiple quotes exist', async () => {
+      const workId = '1';
+      // Query já retorna ordenado por preco_unitario ASC, então o primeiro é o mais barato
+      const mockResult = [
+        {
+          unit_price: 0.78, // Mais barato
+          sku: 'TIJ-CERAMICO-C',
+          supplier_name: 'Fornecedor C',
+        },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findCheapestByWorkId(workId);
+
+      expect(result).not.toBeNull();
+      expect(result?.unitPrice).toBe(0.78);
+      expect(result?.sku).toBe('TIJ-CERAMICO-C');
+    });
+
+    it('should convert decimal to number correctly', async () => {
+      const workId = '1';
+      const mockResult = [
+        {
+          unit_price: 25.99,
+          sku: 'TEST-SKU',
+          supplier_name: 'Test Supplier',
+        },
+      ];
+
+      mockPrisma.$queryRaw.mockResolvedValue(mockResult);
+
+      const result = await repository.findCheapestByWorkId(workId);
+
+      expect(result).not.toBeNull();
+      expect(result?.unitPrice).toBe(25.99);
+      expect(typeof result?.unitPrice).toBe('number');
+    });
+  });
 });
