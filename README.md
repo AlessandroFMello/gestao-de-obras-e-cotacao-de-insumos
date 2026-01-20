@@ -215,7 +215,7 @@ Essas evoluções podem ser implementadas sem quebra estrutural do domínio.
 
 ```bash
 # Clone o repositório
-git clone <repository-url>  
+git clone git@github.com:AlessandroFMello/gestao-de-obras-e-cotacao-de-insumos.git 
 cd gestao-de-obras-e-cotacao-de-insumos
 
 # Inicie os containers (banco de dados e API)
