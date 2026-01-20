@@ -1,9 +1,48 @@
 import { getPrismaClient } from '../../infrastructure/database/PrismaClientFactory.js';
 import type { ICotacaoReadRepository } from '../../application/ports/queries/ICotacaoReadRepository.js';
 import type { MenorPrecoInsumoDTO } from '../../application/dtos/MenorPrecoInsumoDTO.js';
+import type { CheapestQuoteDTO } from '../../application/dtos/CheapestQuoteDTO.js';
 import { Prisma } from '../../../prisma/generated/client.js';
 
 export class CotacaoReadRepository implements ICotacaoReadRepository {
+  async findCheapestByWorkId(workId: string): Promise<CheapestQuoteDTO> {
+    const prisma = getPrismaClient();
+
+    const result = await prisma.$queryRaw<
+      Array<{
+        unit_price: number;
+        sku: string;
+        supplier_name: string;
+      }>
+    >(
+      Prisma.sql`
+        SELECT 
+          c.preco_unitario AS unit_price,
+          c.sku AS sku,
+          f.nome AS supplier_name
+        FROM cotacoes c
+        INNER JOIN insumos i ON c.insumo_id = i.id
+        INNER JOIN obras_insumos oi ON i.id = oi.insumo_id
+        INNER JOIN fornecedores f ON c.fornecedor_id = f.id
+        WHERE oi.obra_id = ${BigInt(workId)}
+          AND c.valid_to IS NULL
+        ORDER BY c.preco_unitario ASC
+        LIMIT 1
+      `
+    );
+
+    if (result.length === 0 || !result[0]) {
+      return null;
+    }
+
+    const row = result[0];
+    return {
+      unitPrice: Number(row.unit_price),
+      sku: row.sku,
+      supplierName: row.supplier_name,
+    };
+  }
+
   async findCheapestBySupplyId(supplyId: string): Promise<MenorPrecoInsumoDTO> {
     const prisma = getPrismaClient();
 
@@ -53,4 +92,3 @@ export class CotacaoReadRepository implements ICotacaoReadRepository {
     };
   }
 }
-
